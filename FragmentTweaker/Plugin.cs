@@ -9,36 +9,6 @@ using Nautilus.Json.ExtensionMethods;
 
 namespace FragmentTweaker
 {
-    [HarmonyPatch(typeof(KnownTech), nameof(KnownTech.Initialize))]
-    public static class KnownTechInitializePatch
-    {
-        [HarmonyPrefix]
-        public static void Prefix(PDAData data)
-        {
-            Dictionary<TechType, int> fragmentDict = new Dictionary<TechType, int>();
-            data.scanner.ForEach(scanTech =>
-            {
-                if (scanTech.isFragment && scanTech.totalFragments < 20)
-                {
-                    fragmentDict.Add(scanTech.key, scanTech.totalFragments);
-
-                    if (Plugin.TweakedTechs.TryGetValue(scanTech.key, out int newFragmentCount))
-                    {
-                        if (scanTech.totalFragments != newFragmentCount)
-                        {
-                            Plugin.Logger.LogInfo($"Increased fragment count for {scanTech.key} from {scanTech.totalFragments} to {newFragmentCount}!");
-                            scanTech.totalFragments = newFragmentCount;
-                        }
-                    }
-                }
-            });
-            if (!File.Exists(Plugin.TechDB))
-            {
-                fragmentDict.SaveJson(Plugin.TechDB);
-            }
-        }
-    }
-
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     [BepInDependency("com.snmodding.nautilus")]
     public class Plugin : BaseUnityPlugin
